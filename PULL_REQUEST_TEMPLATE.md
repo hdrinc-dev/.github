@@ -28,7 +28,7 @@ List (or count) the automated unit, integration, or functional tests developed f
 ## Manual Testing
 List steps for a reviewer to manually test this update (e.g., Go to page ABC, click on DEF button, you should see “GHI”)
 
-## HDR AppDev Checklist
+## HDR AppDev Checklist (check to confirm consideration)
 - [ ] Does the code follow HDR style guidelines and patterns?
 - [ ] Does the code work? Does it perform its intended function, the logic is correct, etc.?
 - [ ] Does the PR bring the level of code quality/health up a level or two?
