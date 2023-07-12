@@ -1,5 +1,8 @@
-## PR Scope
+## PR Scope/Purpose
 Please include a summary of the change and updates this PR includes. Please also include relevant motivation and context. List any dependencies that are required for this change.
+
+## Notes to Reviewers
+List any notes that would be relevant for a reviewer, including necessary database updates or environment settings.
 
 ## Tickets Addressed
 JIRATAG-ID (e.g., PROJ-123)
@@ -8,9 +11,6 @@ JIRATAG-ID (e.g., PROJ-123)
 - [ ] Urgent! Need review ASAP
 - [ ] Normal – project/delivery may be impacted by too long a wait, please review as queued
 - [ ] Low – other PRs can take priority, the project/delivery isn’t impacted meaningfully by this waiting
-
-## Notes
-List any notes that would be relevant for a reviewer, including necessary database updates or environment settings.
 
 ## Required Author Signoffs
 - [ ] I have performed a self-review of my own code
