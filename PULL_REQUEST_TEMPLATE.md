@@ -10,14 +10,13 @@ JIRATAG-ID (e.g., PROJ-123)
 - [ ] Low – other PRs can take priority, the project/delivery isn’t impacted meaningfully by this waiting
 
 ## Required Author Signoffs
+- [ ] I have confirmed this PR targets the correct branch
 - [ ] I have performed a self-review of my own code
-- [ ] I have commented my code as necessary
-- [ ] I have made corresponding changes to the documentation
+- [ ] I have commented my code where appropriate
 - [ ] My changes generate no new warnings or errors
-- [ ] I have added tests that prove my fix is effective or that my feature works
 - [ ] New and existing unit tests pass locally with my changes
-
-*Note that it's ok if a couple of these aren't checked, but the majority should be checked to confirm your self-review.*
+- [ ] If necessary, I have made corresponding changes to the documentation
+- [ ] As appropriate, I have added tests that prove my fix is effective or that my feature works
 
 ## Automated Tests
 List (or count) the automated unit, integration, or functional tests developed for this PR. If not applicable, list “N/A”
