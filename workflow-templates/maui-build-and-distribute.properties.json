@@ -1,0 +1,4 @@
+{
+    "name": "MAUI Build and Distribute (Android and iOS applications with multiple environments)",
+    "description": "This workflow can be used to build and distribute MAUI applications for Android and iOS platforms across multiple environments."
+}

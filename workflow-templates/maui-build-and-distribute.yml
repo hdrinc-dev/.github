@@ -1,0 +1,114 @@
+name: MAUI Build and Distribute (Android and iOS applications with multiple environments)
+
+on:
+  push:
+    branches:
+      - dev
+      - 'release/**'
+      - main
+  pull_request:
+    branches: [ dev, 'release/**', main ]
+  workflow_dispatch:
+
+concurrency:
+  group: maui-${{ github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  # ------------------ ANDROID ------------------
+  maui-android:
+    uses: hdrinc-dev/forma/.github/workflows/maui-android.yml@main
+    with:
+      runs-on: 'windows-large-8'
+      dotnet-version: '9.0.x'
+      dotnet-publish-version: '9.0'
+      java-version: '11'
+      project-directory: '/'
+      project-name: 'MyApp'
+      apk-filename: 'MyApp.apk'
+      appsettings-filename: 'appsettings.json'
+    secrets: inherit
+
+  # Distribute to Firebase App Distribution for dev builds
+  distribute-android-firebase-dev:
+    if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && github.ref_name == 'dev'
+    needs: maui-android
+    uses: hdrinc-dev/forma/.github/workflows/distribute-to-firebase.yml@main
+    with:
+      filename: 'MyApp.apk'
+      firebase-app-id: ''
+      tag-label: 'android'
+    secrets: inherit
+
+  # Distribute to Firebase App Distribution for uat builds
+  distribute-android-firebase-test:
+    if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && startsWith(github.ref_name, 'release/')
+    needs: maui-android
+    uses: hdrinc-dev/forma/.github/workflows/distribute-to-firebase.yml@main
+    with:
+      filename: 'MyApp.apk'
+      firebase-app-id: ''
+      tag-label: 'android'
+    secrets: inherit
+
+  # Distribute to Firebase App Distribution for prod builds
+  distribute-android-firebase-prod:
+    if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && github.ref_name == 'main'
+    needs: maui-android
+    uses: hdrinc-dev/forma/.github/workflows/distribute-to-firebase.yml@main
+    with:
+      filename: 'MyApp.apk'
+      firebase-app-id: ''
+      tag-label: 'android'
+    secrets: inherit
+
+  # ------------------ iOS build ------------------
+  maui-ios:
+    uses: hdrinc-dev/forma/.github/workflows/maui-ios.yml@main
+    with:
+      runs-on: 'macos-15'
+      xcode-version: '16.4'
+      dotnet-version: '9.0.x'
+      dotnet-publish-version: '9.0'
+      project-directory: 'MyApp/'
+      project-name: 'MyApp'
+      ipa-filename: 'MyApp.ipa'
+      appsettings-filename: 'appsettings.json'
+    secrets:
+      APPSETTINGS_BASE64: ${{ secrets.APPSETTINGS_BASE64 }}
+      IOS_SIGNING_CERTIFICATE_BASE64: ${{ secrets.IOS_COMMERCIAL_SIGNING_CERTIFICATE_BASE64 }}
+      IOS_SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.IOS_COMMERCIAL_SIGNING_CERTIFICATE_PASSWORD }}
+      IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
+      IOS_KEYCHAIN_PASSWORD: ${{ secrets.IOS_KEYCHAIN_PASSWORD }}
+      
+  # Distribute to App Store if on main branch
+  distribute-ios-appstore:
+    if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && github.ref_name == 'main'
+    needs: maui-ios
+    uses: hdrinc-dev/forma/.github/workflows/distribute-to-appstore.yml@main
+    with:
+      artifact-name: 'MyApp.ipa'
+      app-store-app-id: ''
+    secrets: inherit
+  
+  # Distribute to Firebase App Distribution for dev builds
+  distribute-ios-firebase-dev:
+    if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && github.ref_name == 'dev'
+    needs: maui-ios
+    uses: hdrinc-dev/forma/.github/workflows/distribute-to-firebase.yml@main
+    with:
+      filename: 'MyApp.ipa'
+      firebase-app-id: ''
+      tag-label: 'ios'
+    secrets: inherit
+
+  # Distribute to Firebase App Distribution for uat builds
+  distribute-ios-firebase-test:
+    if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && startsWith(github.ref_name, 'release/')
+    needs: maui-ios
+    uses: hdrinc-dev/forma/.github/workflows/distribute-to-firebase.yml@main
+    with:
+      filename: 'MyApp.ipa'
+      firebase-app-id: ''
+      tag-label: 'ios'
+    secrets: inherit
