@@ -1,4 +1,7 @@
-name: MAUI Build and Distribute (Android and iOS applications with multiple environments)
+name: MAUI Build & Distribute
+description: Build and distribute .NET MAUI applications for Android and iOS across multiple environments (e.g., Development, Test, Production).
+# Please refer to the R0EADME.md files for each reusable workflow referenced in these jobs for more configuration details.
+# https://github.com/hdrinc-dev/forma/tree/main/.github/workflows
 
 on:
   push:
@@ -11,11 +14,11 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: maui-${{ github.ref_name }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  # ------------------ ANDROID ------------------
+  # Android publish
   maui-android:
     uses: hdrinc-dev/forma/.github/workflows/maui-android.yml@main
     with:
@@ -29,7 +32,7 @@ jobs:
       appsettings-filename: 'appsettings.json'
     secrets: inherit
 
-  # Distribute to Firebase App Distribution for dev builds
+  # Android Distribute to Firebase (DEV)
   distribute-android-firebase-dev:
     if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && github.ref_name == 'dev'
     needs: maui-android
@@ -40,7 +43,7 @@ jobs:
       tag-label: 'android'
     secrets: inherit
 
-  # Distribute to Firebase App Distribution for uat builds
+  # Android Distribute to Firebase (UAT)
   distribute-android-firebase-test:
     if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && startsWith(github.ref_name, 'release/')
     needs: maui-android
@@ -50,8 +53,11 @@ jobs:
       firebase-app-id: ''
       tag-label: 'android'
     secrets: inherit
+  
+  # If you app has multiple environments that have unique applications (e.g. dev, test, prod) you can create a distribution job for each environment.
+  # You may only need one distribution job if all environments distribute to the same platform and use the same application.
 
-  # Distribute to Firebase App Distribution for prod builds
+  # Android Distribute to Firebase (PROD)
   distribute-android-firebase-prod:
     if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && github.ref_name == 'main'
     needs: maui-android
@@ -62,7 +68,7 @@ jobs:
       tag-label: 'android'
     secrets: inherit
 
-  # ------------------ iOS build ------------------
+  # iOS publish
   maui-ios:
     uses: hdrinc-dev/forma/.github/workflows/maui-ios.yml@main
     with:
@@ -80,18 +86,11 @@ jobs:
       IOS_SIGNING_CERTIFICATE_PASSWORD: ${{ secrets.IOS_COMMERCIAL_SIGNING_CERTIFICATE_PASSWORD }}
       IOS_PROVISIONING_PROFILE_BASE64: ${{ secrets.IOS_PROVISIONING_PROFILE_BASE64 }}
       IOS_KEYCHAIN_PASSWORD: ${{ secrets.IOS_KEYCHAIN_PASSWORD }}
-      
-  # Distribute to App Store if on main branch
-  distribute-ios-appstore:
-    if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && github.ref_name == 'main'
-    needs: maui-ios
-    uses: hdrinc-dev/forma/.github/workflows/distribute-to-appstore.yml@main
-    with:
-      artifact-name: 'MyApp.ipa'
-      app-store-app-id: ''
-    secrets: inherit
   
-  # Distribute to Firebase App Distribution for dev builds
+  # If you app has multiple environments that have unique applications (e.g. dev, test, prod) you can create a distribution job for each environment.
+  # You may only need one distribution job if all environments distribute to the same platform and use the same application.
+
+  # iOS Distribute to Firebase (DEV)
   distribute-ios-firebase-dev:
     if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && github.ref_name == 'dev'
     needs: maui-ios
@@ -102,7 +101,7 @@ jobs:
       tag-label: 'ios'
     secrets: inherit
 
-  # Distribute to Firebase App Distribution for uat builds
+  # iOS Distribute to Firebase (UAT)
   distribute-ios-firebase-test:
     if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && startsWith(github.ref_name, 'release/')
     needs: maui-ios
@@ -111,4 +110,14 @@ jobs:
       filename: 'MyApp.ipa'
       firebase-app-id: ''
       tag-label: 'ios'
+    secrets: inherit
+
+  # iOS Distribute to AppStore (PROD)
+  distribute-ios-appstore:
+    if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && github.ref_name == 'main'
+    needs: maui-ios
+    uses: hdrinc-dev/forma/.github/workflows/distribute-to-appstore.yml@main
+    with:
+      artifact-name: 'MyApp.ipa'
+      app-store-app-id: ''
     secrets: inherit
