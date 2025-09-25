@@ -1,6 +1,5 @@
 name: MAUI Build & Distribute (Android + iOS)
-description: Build and distribute .NET MAUI applications for Android and iOS across multiple environments (e.g., Development, Test, Production).
-# Please refer to the R0EADME.md files for each reusable workflow referenced in these jobs for more configuration details.
+# Please refer to the README.md files for each reusable workflow referenced in these jobs for more configuration details.
 # https://github.com/hdrinc-dev/forma/tree/main/.github/workflows
 
 on:
