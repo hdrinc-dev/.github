@@ -1,4 +1,14 @@
 {
-    "name": "MAUI Build and Distribute (Android and iOS applications with multiple environments)",
-    "description": "This workflow can be used to build and distribute MAUI applications for Android and iOS platforms across multiple environments."
+    "name": "MAUI Build & Distribute (Android + iOS)",
+    "description": "Build and distribute .NET MAUI applications for Android and iOS across multiple environments (e.g., Development, Test, Production).",
+    "iconName": "octicon device-mobile",
+    "categories": [
+        "Deployment",
+        "Continuous integration",
+        "Mobile"
+    ],
+    "filePatterns": [
+        "src/**.csproj",
+        "**/*.sln"
+    ]
 }
