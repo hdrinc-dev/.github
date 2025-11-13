@@ -1,5 +1,5 @@
 name: .NET Container App - Build, Publish, & Distribute
-run-name: '.NET Container App - @${{ github.actor }}'
+run-name: '.NET Container App'
 # Please refer to the README.md files for each reusable workflow referenced in these jobs for more configuration details.
 # https://github.com/hdrinc-dev/forma/tree/main/.github/workflows
 
