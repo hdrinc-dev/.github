@@ -1,0 +1,14 @@
+{
+    "name": ".NET Container App - Build, Publish, & Deploy",
+    "description": "Build, publish, and deploy .NET applications to Azure though containerization utilizing Octopus Deploy.",
+    "iconName": "octicon azure",
+    "categories": [
+        "Deployment",
+        "Continuous integration",
+        "Web"
+    ],
+    "filePatterns": [
+        "src/**.csproj",
+        "**/*.sln"
+    ]
+}
