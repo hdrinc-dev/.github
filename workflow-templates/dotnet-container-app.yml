@@ -1,0 +1,98 @@
+name: .NET Container App - Build, Publish, & Distribute
+run-name: '.NET Container App - @${{ github.actor }}'
+# Please refer to the README.md files for each reusable workflow referenced in these jobs for more configuration details.
+# https://github.com/hdrinc-dev/forma/tree/main/.github/workflows
+
+# Update the branching patter as needed
+on:
+  push:
+    branches:
+      - dev
+      - 'release/**'
+      - main
+  pull_request:
+    branches:
+      - dev
+      - 'release/**'
+      - main
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+  
+env:
+  OCTOPUS_ENV: ${{ github.ref_name == 'dev' && 'Development' || startsWith(github.ref_name, 'release/') && 'Test' || github.ref_name == 'main' && 'Production' || 'Development' }} # Update the environment conditions as needed
+
+jobs:
+  build:
+    uses: hdrinc-dev/forma/.github/workflows/dotnet-webapp-workflow.yml@v2
+    with:
+      dotnet-version: '9.0.X'
+      install-maui-workload: false
+      additional-build-args: 'MyApp.sln' # Change the name to your solution file
+      additional-restore-args: 'MyApp.sln --force-evaluate' # Change the name to your solution file
+      startup-project-path: './src/MyApp/AsseTrac.csproj' # Set this to the main web project of your application
+      migrations-target-runtime: 'linux-x64'
+      migrations-output: './migrations/efbundle'
+      migrations-project-path: './src/MyApp/MyApp.csproj' # Set this to the project that contains your EF Core migrations
+      publish-to: 'acr'
+    secrets: inherit
+  
+  package:
+    if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request'
+    needs: [ build ]
+    runs-on: [ ps7 ]
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Download EF Bundle and Create Blank AppSettings
+        uses: hdrinc-dev/forma/.github/actions/dotnet/download-bundled-migrations@v2
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish package to Octopus
+        uses: hdrinc-dev/forma/.github/actions/octopus/package@v2
+        with:
+          octopus-api-key: ${{ secrets.OCTOPUS_API_KEY }}
+          octopus-space: 'HDR Inc.'
+          octopus-url: 'https://hdrinc.octopus.app'
+          octopus-project: 'AsseTrac' # Set this to your Octopus project name
+          version-number: ${{ needs.build.outputs.version-number }}
+          package-id: 'AsseTrac.API.EF.Migrations' # Set this to your desired Octopus package ID for the migrations
+          path-to-package: './migrations'
+
+  release:
+    if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request'
+    needs: [ build,package ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Release in Octopus
+        uses: hdrinc-dev/forma/.github/actions/octopus/release@v2
+        with:
+          octopus-api-key: ${{ secrets.OCTOPUS_API_KEY }}
+          octopus-space: 'HDR Inc.'
+          octopus-url: 'https://hdrinc.octopus.app'
+          packages: | # Update this to match your package ID of the web app located in you're .csproj file
+            assetrac/api 
+          octopus-project: 'AsseTrac' # Set this to your Octopus project name
+          version-number: ${{ needs.build.outputs.version-number }}
+          version-controlled: 'false'
+
+  deploy:
+    if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && github.ref_name == 'dev' # Remove the dev branch condition to enable deployments to other branches/environments
+    needs: [ build,package,release ]
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "Environment = $OCTOPUS_ENV"
+
+      - name: Deploy Release in Octopus
+        uses: hdrinc-dev/forma/.github/actions/octopus/deploy@v2
+        with:
+          octopus-api-key: ${{ secrets.OCTOPUS_API_KEY }}
+          octopus-space: 'HDR Inc.'
+          octopus-url: 'https://hdrinc.octopus.app'
+          octopus-project: 'AsseTrac' # Set this to your Octopus project name
+          version-number: ${{ needs.build.outputs.version-number }}
+          octopus-environment: ${{ env.OCTOPUS_ENV }}
