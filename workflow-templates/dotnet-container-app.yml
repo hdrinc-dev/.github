@@ -37,6 +37,7 @@ jobs:
       migrations-output: './migrations/efbundle'
       migrations-project-path: './src/MyApp/MyApp.csproj' # Set this to the project that contains your EF Core migrations
       publish-to: 'acr'
+      projects-to-publish: '["./src/MyApp/MyApp.csproj"]'
     secrets: inherit
   
   package:
