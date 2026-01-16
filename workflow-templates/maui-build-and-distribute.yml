@@ -20,7 +20,7 @@ jobs:
   # Android publish
   # Please refer to https://github.com/hdrinc-dev/forma/blob/main/.github/workflows/maui-android.md for more details on android build configuration.
   maui-android:
-    uses: hdrinc-dev/forma/.github/workflows/maui-android.yml@main
+    uses: hdrinc-dev/forma/.github/workflows/maui-android.yml@v1
     with:
       runs-on: 'windows-large-8'
       dotnet-version: '9.0.x'
@@ -40,7 +40,7 @@ jobs:
   distribute-android-firebase-dev:
     if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && github.ref_name == 'dev'
     needs: maui-android
-    uses: hdrinc-dev/forma/.github/workflows/distribute-to-firebase.yml@main
+    uses: hdrinc-dev/forma/.github/workflows/distribute-to-firebase.yml@v1
     with:
       filename: 'MyApp.apk'
       firebase-app-id: ''
@@ -52,7 +52,7 @@ jobs:
   distribute-android-firebase-test:
     if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && startsWith(github.ref_name, 'release/')
     needs: maui-android
-    uses: hdrinc-dev/forma/.github/workflows/distribute-to-firebase.yml@main
+    uses: hdrinc-dev/forma/.github/workflows/distribute-to-firebase.yml@v1
     with:
       filename: 'MyApp.apk'
       firebase-app-id: ''
@@ -64,7 +64,7 @@ jobs:
   distribute-android-firebase-prod:
     if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && github.ref_name == 'main'
     needs: maui-android
-    uses: hdrinc-dev/forma/.github/workflows/distribute-to-firebase.yml@main
+    uses: hdrinc-dev/forma/.github/workflows/distribute-to-firebase.yml@v1
     with:
       filename: 'MyApp.apk'
       firebase-app-id: ''
@@ -74,7 +74,7 @@ jobs:
   # iOS publish
   # Please refer to https://github.com/hdrinc-dev/forma/blob/main/.github/workflows/maui-ios.md for more details on iOS build configuration.
   maui-ios:
-    uses: hdrinc-dev/forma/.github/workflows/maui-ios.yml@main
+    uses: hdrinc-dev/forma/.github/workflows/maui-ios.yml@v1
     with:
       runs-on: 'macos-15'
       xcode-version: '16.4'
@@ -99,7 +99,7 @@ jobs:
   distribute-ios-firebase-dev:
     if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && github.ref_name == 'dev'
     needs: maui-ios
-    uses: hdrinc-dev/forma/.github/workflows/distribute-to-firebase.yml@main
+    uses: hdrinc-dev/forma/.github/workflows/distribute-to-firebase.yml@v1
     with:
       filename: 'MyApp.ipa'
       firebase-app-id: ''
@@ -111,7 +111,7 @@ jobs:
   distribute-ios-firebase-test:
     if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && startsWith(github.ref_name, 'release/')
     needs: maui-ios
-    uses: hdrinc-dev/forma/.github/workflows/distribute-to-firebase.yml@main
+    uses: hdrinc-dev/forma/.github/workflows/distribute-to-firebase.yml@v1
     with:
       filename: 'MyApp.ipa'
       firebase-app-id: ''
@@ -123,7 +123,7 @@ jobs:
   distribute-ios-appstore:
     if: github.actor != 'dependabot[bot]' && github.event_name != 'pull_request' && github.ref_name == 'main'
     needs: maui-ios
-    uses: hdrinc-dev/forma/.github/workflows/distribute-to-appstore.yml@main
+    uses: hdrinc-dev/forma/.github/workflows/distribute-to-appstore.yml@v1
     with:
       artifact-name: 'MyApp.ipa'
       app-store-app-id: ''
